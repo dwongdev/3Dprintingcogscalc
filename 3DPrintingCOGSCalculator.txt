@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Printing COGS Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .profit-box-positive {
+            background-color: #d1fae5; /* green-50 */
+            border-color: #6ee7b7;   /* green-300 */
+        }
+        .profit-box-negative {
+            background-color: #fee2e2; /* red-50 */
+            border-color: #fca5a5;   /* red-300 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-gray-200">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 mb-6 sm:mb-8">3D Printing COGS Calculator</h1>
+        <p class="text-center text-gray-600 mb-4">
+            Enter your costs below to automatically calculate the Cost of Goods Sold (COGS) for your 3D printed products.
+        </p>
+
+        <!-- Product Name Input -->
+        <div class="mb-8">
+            <label for="productName" class="block text-sm font-semibold text-gray-700 mb-2">Product Name</label>
+            <input type="text" id="productName" placeholder="Enter Product Name" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+        </div>
+
+        <!-- Main Grid Container -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+            <!-- First Column: Cost Inputs -->
+            <div class="space-y-4">
+                <!-- Filament Costs -->
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-200">
+                    <h3 class="text-lg font-bold text-purple-800 mb-3">Filament Costs</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="filamentTypeDropdown" class="block text-sm font-semibold text-gray-700 mb-1">Filament Type</label>
+                            <select id="filamentTypeDropdown" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                                <option value="" disabled>-- Select a Type --</option>
+                                <option value="15">Cheap PLA ($15/kg)</option>
+                                <option value="20" selected>Regular PLA ($20/kg)</option>
+                                <option value="25">Silk PLA ($25/kg)</option>
+                                <option value="30">Wood PLA ($30/kg)</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="filamentPrice" class="block text-sm font-semibold text-gray-700 mb-1">Filament Spool Price ($)</label>
+                            <input type="number" id="filamentPrice" value="20.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="printWeight" class="block text-sm font-semibold text-gray-700 mb-1">Filament Used (grams)</label>
+                            <input type="number" id="printWeight" value="50" min="0" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="printTime" class="block text-sm font-semibold text-gray-700 mb-1">Printing Time (hours)</label>
+                            <input type="number" id="printTime" value="2.5" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Overhead Costs -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">Overhead Costs</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="electricityCost" class="block text-sm font-semibold text-gray-700 mb-1">Electricity Cost Per kWh ($)</label>
+                            <input type="number" id="electricityCost" value="0.19" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="printerWattage" class="block text-sm font-semibold text-gray-700 mb-1">Printer Wattage (W)</label>
+                            <input type="number" id="printerWattage" value="150" min="0" step="1" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="printerAmortization" class="block text-sm font-semibold text-gray-700 mb-1">Printer Amortization ($/hour)</label>
+                            <input type="number" id="printerAmortization" value="0.15" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="otherOverhead" class="block text-sm font-semibold text-gray-700 mb-1">Other Monthly Overhead Cost ($)</label>
+                            <p class="text-xs text-gray-500 mb-2">Fill out only if you wish to include a cost and divide it by the input below. Maybe you want to factor in a commercial license of $30 a month and divide it by 30 below or something similar. Weird field I know but could be useful.</p>
+                            <input type="number" id="otherOverhead" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="unitsPerMonth" class="block text-sm font-semibold text-gray-700 mb-1">Dividing Factor for Other Monthly Overhead Cost</label>
+                            <input type="number" id="unitsPerMonth" value="0" min="0" step="1" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Direct Costs -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">Other Direct Costs</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="cost1" class="block text-sm font-semibold text-gray-700 mb-1">Additional Cost 1 ($)</label>
+                            <input type="number" id="cost1" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="cost2" class="block text-sm font-semibold text-gray-700 mb-1">Additional Cost 2 ($)</label>
+                            <input type="number" id="cost2" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Column: Price & Main Results -->
+            <div class="space-y-4">
+                <!-- Shipping and Fees Dropdowns -->
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-4">
+                    <h3 class="text-lg font-bold text-purple-800 mb-3">Shipping & Marketplace Fees</h3>
+                    <div>
+                        <label for="shippingDropdown" class="block text-sm font-semibold text-gray-700 mb-1">Shipping Cost Type</label>
+                        <select id="shippingDropdown" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                            <option value="0" selected>Free shipping ($0)</option>
+                            <option value="5">Small shipping ($5)</option>
+                            <option value="7.5">Medium shipping ($7.50)</option>
+                            <option value="11">Large shipping ($11)</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="shippingCost" class="block text-sm font-semibold text-gray-700 mb-1">Shipping Cost ($)</label>
+                        <input type="number" id="shippingCost" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="feesDropdown" class="block text-sm font-semibold text-gray-700 mb-1">Marketplace Fee Type</label>
+                        <select id="feesDropdown" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                            <option value="0" selected>IRL - 0%</option>
+                            <option value="0.095">Etsy (no ads) - 9.5%</option>
+                            <option value="0.215">Etsy (ads) - 21.5%</option>
+                            <option value="0.13">eBay (no ads) - 13%</option>
+                            <option value="0.23">eBay (ads) - 23%</option>
+                            <option value="0.10">FB - 10%</option>
+                            <option value="0.106">TTS - 10.6%</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="feesInput" class="block text-sm font-semibold text-gray-700 mb-1">Marketplace Fee (%)</label>
+                        <input type="number" id="feesInput" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+                
+                <!-- Price Inputs -->
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 space-y-4">
+                    <h3 class="text-lg font-bold text-blue-800 mb-3">Price Inputs</h3>
+                    <div>
+                        <label for="salePrice" class="block text-sm font-semibold text-gray-700 mb-2">Final Sale Price ($)</label>
+                        <input type="number" id="salePrice" value="20.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="targetProfit" class="block text-sm font-semibold text-gray-700 mb-2">Target Profit Per Sale ($)</label>
+                        <input type="number" id="targetProfit" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="targetPPH" class="block text-sm font-semibold text-gray-700 mb-2">Target PPH ($)</label>
+                        <input type="number" id="targetPPH" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="targetMargin" class="block text-sm font-semibold text-gray-700 mb-2">Target Margin (%)</label>
+                        <input type="number" id="targetMargin" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+                
+                <!-- Suggested Prices -->
+                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <h3 class="text-lg font-bold text-yellow-800 mb-3 underline">Suggested Prices</h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Triple Base COGS (+ Shipping & Fees)</span>
+                            <span id="suggestedPrice1" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Target $1 PPH</span>
+                            <span id="suggestedPrice2" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Target MSRP for $ Profit Per Sale</span>
+                            <span id="targetProfitPrice" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Target MSRP for Target PPH</span>
+                            <span id="targetPPHPrice" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Target MSRP for Target Margin</span>
+                            <span id="targetMarginPrice" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third Column: Cost Breakdown & Profit -->
+            <div class="space-y-4">
+                <!-- Cost Breakdown (Intermediate) -->
+                <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+                    <h3 class="text-lg font-bold text-green-800 mb-3">Cost Breakdown</h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Material Cost (Filament)</span>
+                            <span id="materialCost" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Electricity Cost</span>
+                            <span id="electricityTotal" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Amortization Cost</span>
+                            <span id="amortizationTotal" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Allocated Monthly Overhead</span>
+                            <span id="overheadAllocated" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Additional Cost 1</span>
+                            <span id="cost1Total" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-700">Additional Cost 2</span>
+                            <span id="cost2Total" class="font-bold text-gray-900">$0.00</span>
+                        </div>
+                        <div class="border-t border-green-200 pt-4 mt-4 flex justify-between items-center">
+                            <span class="text-base font-bold text-green-800">COGS (excl. Shipping & Fees)</span>
+                            <span id="baseCOGS" class="text-base font-extrabold text-green-800">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Final Results -->
+                <div id="finalResultsBox" class="p-6 rounded-xl border-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-base font-bold text-gray-800">Total COGS</span>
+                        <span id="totalCOGS" class="text-base font-semibold text-gray-900">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <span class="text-sm font-semibold text-gray-700">Shipping Cost</span>
+                        <span id="shippingCostSummary" class="font-semibold text-gray-900">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-sm font-semibold text-gray-700">Marketplace Fee</span>
+                        <span id="marketplaceFeeSummary" class="font-semibold text-gray-900">$0.00</span>
+                    </div>
+                    <div class="border-t border-gray-200 pt-4 flex justify-between items-center mb-2">
+                        <span class="text-base font-bold text-gray-800">Your Profit Per Unit</span>
+                        <span id="profit" class="text-base font-semibold text-gray-900">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-base font-bold text-gray-800">Profit Margin</span>
+                        <span id="profitMargin" class="text-base font-semibold text-gray-900">0.00%</span>
+                    </div>
+                     <div class="flex justify-between items-center">
+                        <span class="text-base font-bold text-gray-800">Profit Per Hour (PPH)</span>
+                        <span id="pph" class="text-base font-semibold text-gray-900">$0.00</span>
+                    </div>
+                </div>
+
+                <!-- Discounted Results Box -->
+                <div id="discountedResultsBox" class="p-6 rounded-xl border-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Discounted Profit Calculation</h3>
+                    <div class="mb-4">
+                        <label for="discountPercent" class="block text-sm font-semibold text-gray-700 mb-2">Discount %</label>
+                        <input type="number" id="discountPercent" value="0.00" min="0" step="0.01" class="w-full md:w-3/4 px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-base font-semibold text-gray-700">Discounted Sale Price ($)</span>
+                        <span id="discountedSalePrice" class="font-bold text-gray-900">$0.00</span>
+                    </div>
+                    <div class="border-t border-gray-200 pt-4 flex justify-between items-center mb-2">
+                        <span class="text-base font-bold text-gray-800">Your Profit Per Unit (Discounted)</span>
+                        <span id="discountedProfit" class="text-base font-semibold text-gray-900">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-base font-bold text-gray-800">Profit Margin (Discounted)</span>
+                        <span id="discountedProfitMargin" class="text-base font-semibold text-gray-900">0.00%</span>
+                    </div>
+                     <div class="flex justify-between items-center">
+                        <span class="text-base font-bold text-gray-800">Profit Per Hour (PPH) (Discounted)</span>
+                        <span id="discountedPPH" class="text-base font-semibold text-gray-900">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Table -->
+        <div class="mt-8 pt-8 border-t border-gray-300">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Summary</h2>
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-2 sm:space-y-0">
+                <p class="text-sm text-gray-600">Quick overview of the current calculation.</p>
+                <div class="flex space-x-2">
+                    <button id="copySummaryButton" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-200">
+                        Copy All to Clipboard
+                    </button>
+                    <button id="copySummaryRowButton" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-200">
+                        Copy Row to Clipboard
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table class="w-full text-sm text-left text-gray-600" id="summaryTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Product Name</th>
+                            <th scope="col" class="px-6 py-3 text-center">Filament Used (g)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Printing Time (h)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Shipping Cost ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Marketplace</th>
+                            <th scope="col" class="px-6 py-3 text-center">Fee (%)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Base COGS ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Sale Price ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Profit ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Profit Margin</th>
+                            <th scope="col" class="px-6 py-3 text-center">PPH ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Target $1 PPH ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Target $ Profit ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Target PPH ($)</th>
+                            <th scope="col" class="px-6 py-3 text-center">Target Margin (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap" id="summaryProductName"></td>
+                            <td class="px-6 py-4 text-center" id="summaryPrintWeight"></td>
+                            <td class="px-6 py-4 text-center" id="summaryPrintTime"></td>
+                            <td class="px-6 py-4 text-center" id="summaryShippingCost"></td>
+                            <td class="px-6 py-4 text-center" id="summaryMarketplaceName"></td>
+                            <td class="px-6 py-4 text-center" id="summaryFeePercentage"></td>
+                            <td class="px-6 py-4 text-center" id="summaryBaseCOGS"></td>
+                            <td class="px-6 py-4 text-center" id="summarySalePrice"></td>
+                            <td class="px-6 py-4 text-center" id="summaryProfit"></td>
+                            <td class="px-6 py-4 text-center" id="summaryProfitMargin"></td>
+                            <td class="px-6 py-4 text-center" id="summaryPPH"></td>
+                            <td class="px-6 py-4 text-center" id="summaryTargetPrice1"></td>
+                            <td class="px-6 py-4 text-center" id="summaryTargetPrice2"></td>
+                            <td class="px-6 py-4 text-center" id="summaryTargetPPHPrice"></td>
+                            <td class="px-6 py-4 text-center" id="summaryTargetMarginPrice"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footnote Section for Formulas -->
+        <div class="mt-8 pt-8 border-t border-gray-300">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Calculation Formulas</h2>
+            <div class="max-w-none text-sm text-gray-600">
+                <p>The calculations are based on the following formulas:</p>
+                
+                <h3 class="text-lg font-bold text-gray-700 mt-6">Cost of Goods Sold (COGS)</h3>
+                
+                <p><strong>Material Cost:</strong></p>
+                <p>Material Cost = (Filament Spool Price / 1000) * Filament Used (grams)</p>
+
+                <p><strong>Electricity Cost:</strong></p>
+                <p>Electricity Cost = (Printer Wattage * Print Time / 1000) * Electricity Cost Per kWh</p>
+
+                <p><strong>Amortization Cost:</strong></p>
+                <p>Amortization Cost = Printer Amortization (per hour) * Print Time</p>
+
+                <p><strong>Allocated Monthly Overhead:</strong></p>
+                <p>Allocated Monthly Overhead = Other Monthly Overhead Cost / Dividing Factor for Other Monthly Overhead Cost</p>
+                <p class="text-xs italic">(This cost is $0 if Dividing Factor is 0)</p>
+
+                <p><strong>Additional Cost 1:</strong></p>
+                <p>Additional Cost 1 = Cost 1 input</p>
+                
+                <p><strong>Additional Cost 2:</strong></p>
+                <p>Additional Cost 2 = Cost 2 input</p>
+
+                <p><strong>Marketplace Fee:</strong></p>
+                <p>Marketplace Fee = Final Sale Price * Marketplace Fee (%)</p>
+
+                <p><strong>Base COGS (excluding shipping & fees):</strong></p>
+                <p>Base COGS = Material Cost + Additional Cost 1 + Additional Cost 2 + Electricity Cost + Amortization Cost + Allocated Monthly Overhead</p>
+
+                <p><strong>Total COGS:</strong></p>
+                <p>Total COGS = Base COGS + Shipping Cost + Marketplace Fee</p>
+
+                <h3 class="text-lg font-bold text-gray-700 mt-6">Profit & Suggested Prices</h3>
+
+                <p><strong>Your Profit Per Unit:</strong></p>
+                <p>Profit = Final Sale Price - Total COGS</p>
+
+                <p><strong>Profit Margin:</strong></p>
+                <p>Profit Margin = (Profit / Final Sale Price) * 100</p>
+
+                <p><strong>Profit Per Hour (PPH):</strong></p>
+                <p>PPH = Profit / Print Time</p>
+
+                <p class="text-xs italic">(This cost is $0 if Print Time is 0)</p>
+                <p><strong>Suggested Price (3x Base COGS):</strong></p>
+                <p>Suggested Price = ((Base COGS * 3) + Shipping Cost) / (1 - Marketplace Fee (%))</p>
+
+                <p><strong>Suggested Price (Target $1 PPH):</strong></p>
+                <p>Suggested Price = (Base COGS + Shipping Cost + Print Time) / (1 - Marketplace Fee (%))</p>
+
+                <p><strong>Suggested Price (Target $ Profit Per Sale):</strong></p>
+                <p>Suggested Price = (Base COGS + Shipping Cost + Target Profit Per Sale) / (1 - Marketplace Fee (%))</p>
+
+                <p><strong>Suggested Price (Target PPH):</strong></p>
+                <p>Suggested Price = (Base COGS + Shipping Cost + (Target PPH * Print Time)) / (1 - Marketplace Fee (%))</p>
+
+                <p><strong>Suggested Price (Target Margin):</strong></p>
+                <p>Suggested Price = (Base COGS + Shipping Cost) / (1 - (Marketplace Fee (%) + Target Margin (%)))</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('input');
+            const dropdowns = document.querySelectorAll('select');
+            const outputs = {
+                materialCost: document.getElementById('materialCost'),
+                cost1Total: document.getElementById('cost1Total'),
+                cost2Total: document.getElementById('cost2Total'),
+                electricityTotal: document.getElementById('electricityTotal'),
+                amortizationTotal: document.getElementById('amortizationTotal'),
+                overheadAllocated: document.getElementById('overheadAllocated'),
+                baseCOGS: document.getElementById('baseCOGS'),
+                shippingCostSummary: document.getElementById('shippingCostSummary'),
+                marketplaceFeeSummary: document.getElementById('marketplaceFeeSummary'),
+                totalCOGS: document.getElementById('totalCOGS'),
+                profit: document.getElementById('profit'),
+                profitMargin: document.getElementById('profitMargin'),
+                pph: document.getElementById('pph'),
+                suggestedPrice1: document.getElementById('suggestedPrice1'),
+                suggestedPrice2: document.getElementById('suggestedPrice2'),
+                targetProfitPrice: document.getElementById('targetProfitPrice'),
+                targetPPHPrice: document.getElementById('targetPPHPrice'),
+                // New output element for the target margin price
+                targetMarginPrice: document.getElementById('targetMarginPrice'),
+                finalResultsBox: document.getElementById('finalResultsBox'),
+                
+                // Discounted outputs
+                discountedResultsBox: document.getElementById('discountedResultsBox'),
+                discountedSalePrice: document.getElementById('discountedSalePrice'),
+                discountedProfit: document.getElementById('discountedProfit'),
+                discountedProfitMargin: document.getElementById('discountedProfitMargin'),
+                discountedPPH: document.getElementById('discountedPPH'),
+
+                // Summary Table outputs
+                summaryProductName: document.getElementById('summaryProductName'),
+                summaryPrintWeight: document.getElementById('summaryPrintWeight'),
+                summaryPrintTime: document.getElementById('summaryPrintTime'),
+                summaryShippingCost: document.getElementById('summaryShippingCost'),
+                summaryMarketplaceName: document.getElementById('summaryMarketplaceName'),
+                summaryFeePercentage: document.getElementById('summaryFeePercentage'),
+                summaryBaseCOGS: document.getElementById('summaryBaseCOGS'),
+                summarySalePrice: document.getElementById('summarySalePrice'),
+                summaryProfit: document.getElementById('summaryProfit'),
+                summaryProfitMargin: document.getElementById('summaryProfitMargin'),
+                summaryPPH: document.getElementById('summaryPPH'),
+                summaryTargetPrice1: document.getElementById('summaryTargetPrice1'),
+                summaryTargetPrice2: document.getElementById('summaryTargetPrice2'),
+                summaryTargetPPHPrice: document.getElementById('summaryTargetPPHPrice'),
+                // New summary table cell for target margin price
+                summaryTargetMarginPrice: document.getElementById('summaryTargetMarginPrice'),
+            };
+
+            const filamentTypeDropdown = document.getElementById('filamentTypeDropdown');
+            const filamentPriceInput = document.getElementById('filamentPrice');
+            const shippingDropdown = document.getElementById('shippingDropdown');
+            const shippingCostInput = document.getElementById('shippingCost');
+            const feesDropdown = document.getElementById('feesDropdown');
+            const feesInput = document.getElementById('feesInput');
+            const filamentSpoolWeight = 1000; // Grams
+
+            // Initial filament price setting based on dropdown value
+            if (filamentTypeDropdown.value) {
+                const selectedPricePerKg = parseFloat(filamentTypeDropdown.value);
+                filamentPriceInput.value = (selectedPricePerKg).toFixed(2);
+            }
+            
+            // Initial shipping cost setting based on dropdown value
+            if (shippingDropdown.value) {
+                const selectedShippingCost = parseFloat(shippingDropdown.value);
+                shippingCostInput.value = (selectedShippingCost).toFixed(2);
+            }
+
+            // Initial marketplace fees setting based on dropdown value
+            if (feesDropdown.value) {
+                const selectedFee = parseFloat(feesDropdown.value);
+                feesInput.value = (selectedFee * 100).toFixed(2);
+            }
+
+            function updateCalculator() {
+                // Get all input and dropdown values
+                const productName = document.getElementById('productName').value || 'N/A';
+                const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+                const filamentPrice = parseFloat(document.getElementById('filamentPrice').value) || 0;
+                const shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
+                const printWeight = parseFloat(document.getElementById('printWeight').value) || 0;
+                const printTime = parseFloat(document.getElementById('printTime').value) || 0;
+                const cost1 = parseFloat(document.getElementById('cost1').value) || 0;
+                const cost2 = parseFloat(document.getElementById('cost2').value) || 0;
+                const electricityCost = parseFloat(document.getElementById('electricityCost').value) || 0;
+                const printerWattage = parseFloat(document.getElementById('printerWattage').value) || 0;
+                const printerAmortization = parseFloat(document.getElementById('printerAmortization').value) || 0;
+                const otherOverhead = parseFloat(document.getElementById('otherOverhead').value) || 0;
+                const unitsPerMonth = parseFloat(document.getElementById('unitsPerMonth').value) || 0;
+                
+                const feesDropdown = document.getElementById('feesDropdown');
+                const feePercentage = (parseFloat(document.getElementById('feesInput').value) || 0) / 100;
+                const marketplaceName = feesDropdown.options[feesDropdown.selectedIndex].text;
+                
+                // Get discount percentage
+                const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+                
+                // Get target profit
+                const targetProfit = parseFloat(document.getElementById('targetProfit').value) || 0;
+                
+                // Get target PPH (new input)
+                const targetPPH = parseFloat(document.getElementById('targetPPH').value) || 0;
+
+                // Get target margin (new input)
+                const targetMargin = (parseFloat(document.getElementById('targetMargin').value) || 0) / 100;
+
+
+                // --- Base COGS Calculation (excl. Shipping & Fees) ---
+                // Direct Material Cost (Filament)
+                const costPerGram = filamentPrice / filamentSpoolWeight;
+                const materialCost = costPerGram * printWeight;
+
+                // Electricity Cost
+                const printerkWh = (printerWattage * printTime) / 1000;
+                const electricityTotal = printerkWh * electricityCost;
+                
+                // Amortization Cost
+                const amortizationTotal = printerAmortization * printTime;
+
+                // Allocated Overhead
+                const overheadAllocated = (unitsPerMonth > 0) ? otherOverhead / unitsPerMonth : 0;
+
+                // Calculate Base COGS
+                const baseCOGS = materialCost + cost1 + cost2 + electricityTotal + amortizationTotal + overheadAllocated;
+
+
+                // --- Final COGS and Profit Calculation (incl. Shipping & Fees) ---
+                // Total Fees (calculated from the sale price)
+                const totalFees = salePrice * feePercentage;
+                const totalCOGS = baseCOGS + shippingCost + totalFees;
+
+                // Profit
+                const profit = salePrice - totalCOGS;
+                
+                // Profit Margin
+                const profitMargin = (salePrice > 0) ? (profit / salePrice) * 100 : 0;
+
+                // Total time for PPH calculation (only print time)
+                const totalWorkHours = printTime;
+
+                // Profit Per Hour (PPH) - based on total time
+                const pph = (totalWorkHours > 0) ? profit / totalWorkHours : 0;
+                
+                // --- Discounted Profit Calculation ---
+                const discountedSalePrice = salePrice * (1 - discountPercent / 100);
+                const discountedTotalFees = discountedSalePrice * feePercentage;
+                const discountedTotalCOGS = baseCOGS + shippingCost + discountedTotalFees;
+                const discountedProfit = discountedSalePrice - discountedTotalCOGS;
+                const discountedProfitMargin = (discountedSalePrice > 0) ? (discountedProfit / discountedSalePrice) * 100 : 0;
+                const discountedPPH = (totalWorkHours > 0) ? discountedProfit / totalWorkHours : 0;
+
+
+                // --- Suggested Prices ---
+                let suggestedPrice1 = 0;
+                let suggestedPrice2 = 0;
+                let targetProfitPrice = 0;
+                let targetPPHPrice = 0;
+                let targetMarginPrice = 0; // New variable for the target margin price
+
+                if (1 - feePercentage > 0) {
+                     suggestedPrice1 = ((baseCOGS * 3) + shippingCost) / (1 - feePercentage);
+                     suggestedPrice2 = (baseCOGS + shippingCost + totalWorkHours) / (1 - feePercentage);
+                     targetProfitPrice = (baseCOGS + shippingCost + targetProfit) / (1 - feePercentage);
+                     targetPPHPrice = (baseCOGS + shippingCost + (targetPPH * totalWorkHours)) / (1 - feePercentage);
+
+                     // Calculate the new target margin price
+                     const denominator = 1 - (feePercentage + targetMargin);
+                     if (denominator > 0) {
+                        targetMarginPrice = (baseCOGS + shippingCost) / denominator;
+                     }
+                }
+
+
+                // Display results
+                outputs.materialCost.textContent = `$${materialCost.toFixed(2)}`;
+                outputs.electricityTotal.textContent = `$${electricityTotal.toFixed(2)}`;
+                outputs.amortizationTotal.textContent = `$${amortizationTotal.toFixed(2)}`;
+                outputs.overheadAllocated.textContent = `$${overheadAllocated.toFixed(2)}`;
+                outputs.cost1Total.textContent = `$${cost1.toFixed(2)}`;
+                outputs.cost2Total.textContent = `$${cost2.toFixed(2)}`;
+                outputs.baseCOGS.textContent = `$${baseCOGS.toFixed(2)}`;
+                
+                // Display shipping and fees in the summary section
+                outputs.shippingCostSummary.textContent = `$${shippingCost.toFixed(2)}`;
+                outputs.marketplaceFeeSummary.textContent = `$${totalFees.toFixed(2)}`;
+
+                outputs.totalCOGS.textContent = `$${totalCOGS.toFixed(2)}`;
+                outputs.profit.textContent = `$${profit.toFixed(2)}`;
+                outputs.profitMargin.textContent = `${profitMargin.toFixed(2)}%`;
+                outputs.pph.textContent = `$${pph.toFixed(2)}`;
+                
+                outputs.suggestedPrice1.textContent = `$${suggestedPrice1.toFixed(2)}`;
+                outputs.suggestedPrice2.textContent = `$${suggestedPrice2.toFixed(2)}`;
+                outputs.targetProfitPrice.textContent = `$${targetProfitPrice.toFixed(2)}`;
+                outputs.targetPPHPrice.textContent = `$${targetPPHPrice.toFixed(2)}`;
+                outputs.targetMarginPrice.textContent = `$${targetMarginPrice.toFixed(2)}`; // Display the new price
+
+                // Change color of final results box based on profit
+                if (profit > 0) {
+                    outputs.finalResultsBox.classList.remove('profit-box-negative');
+                    outputs.finalResultsBox.classList.add('profit-box-positive');
+                } else {
+                    outputs.finalResultsBox.classList.remove('profit-box-positive');
+                    outputs.finalResultsBox.classList.add('profit-box-negative');
+                }
+                
+                // Display discounted results
+                outputs.discountedSalePrice.textContent = `$${discountedSalePrice.toFixed(2)}`;
+                outputs.discountedProfit.textContent = `$${discountedProfit.toFixed(2)}`;
+                outputs.discountedProfitMargin.textContent = `${discountedProfitMargin.toFixed(2)}%`;
+                outputs.discountedPPH.textContent = `$${discountedPPH.toFixed(2)}`;
+
+                // Change color of discounted results box based on profit
+                if (discountedProfit > 0) {
+                    outputs.discountedResultsBox.classList.remove('profit-box-negative');
+                    outputs.discountedResultsBox.classList.add('profit-box-positive');
+                } else {
+                    outputs.discountedResultsBox.classList.remove('profit-box-positive');
+                    outputs.discountedResultsBox.classList.add('profit-box-negative');
+                }
+
+
+                // Update summary table
+                outputs.summaryProductName.textContent = productName;
+                outputs.summaryPrintWeight.textContent = printWeight;
+                outputs.summaryPrintTime.textContent = printTime;
+                outputs.summaryShippingCost.textContent = `$${shippingCost.toFixed(2)}`;
+                outputs.summaryMarketplaceName.textContent = marketplaceName;
+                outputs.summaryFeePercentage.textContent = `${(feePercentage * 100).toFixed(2)}%`;
+                outputs.summaryBaseCOGS.textContent = `$${baseCOGS.toFixed(2)}`;
+                outputs.summarySalePrice.textContent = `$${salePrice.toFixed(2)}`;
+                outputs.summaryProfit.textContent = `$${profit.toFixed(2)}`;
+                outputs.summaryProfitMargin.textContent = `${profitMargin.toFixed(2)}%`;
+                outputs.summaryPPH.textContent = `$${pph.toFixed(2)}`;
+                outputs.summaryTargetPrice1.textContent = `$${suggestedPrice2.toFixed(2)}`;
+                outputs.summaryTargetPrice2.textContent = `$${targetProfitPrice.toFixed(2)}`;
+                outputs.summaryTargetPPHPrice.textContent = `$${targetPPHPrice.toFixed(2)}`;
+                outputs.summaryTargetMarginPrice.textContent = `$${targetMarginPrice.toFixed(2)}`; // Update the new summary table cell
+            }
+            
+            // Handle Filament Type dropdown change
+            filamentTypeDropdown.addEventListener('change', (e) => {
+                if (e.target.value === 'custom') {
+                    filamentPriceInput.value = '';
+                    filamentPriceInput.placeholder = 'Enter Custom Price';
+                    filamentPriceInput.focus();
+                } else {
+                    const selectedPricePerKg = parseFloat(e.target.value);
+                    filamentPriceInput.value = (selectedPricePerKg).toFixed(2);
+                }
+                updateCalculator();
+            });
+
+            // Handle Shipping Cost dropdown change
+            shippingDropdown.addEventListener('change', (e) => {
+                if (e.target.value === 'custom') {
+                    shippingCostInput.value = '';
+                    shippingCostInput.placeholder = 'Enter Custom Price';
+                    shippingCostInput.focus();
+                } else {
+                    const selectedShippingCost = parseFloat(e.target.value);
+                    shippingCostInput.value = (selectedShippingCost).toFixed(2);
+                }
+                updateCalculator();
+            });
+
+            // Handle Fees dropdown change
+            feesDropdown.addEventListener('change', (e) => {
+                if (e.target.value === 'custom') {
+                    feesInput.value = '';
+                    feesInput.placeholder = 'Enter Custom Fee (%)';
+                    feesInput.focus();
+                } else {
+                    const selectedFee = parseFloat(e.target.value);
+                    feesInput.value = (selectedFee * 100).toFixed(2);
+                }
+                updateCalculator();
+            });
+
+            // Copy to clipboard functionality for the entire table
+            document.getElementById('copySummaryButton').addEventListener('click', () => {
+                const table = document.getElementById('summaryTable');
+                let tableText = '';
+                
+                // Get headers
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+                tableText += headers.join('\t') + '\n';
+                
+                // Get row data
+                const row = table.querySelector('tbody tr');
+                const rowData = Array.from(row.querySelectorAll('td')).map(td => td.textContent.trim());
+                tableText += rowData.join('\t');
+
+                // Create a temporary textarea to hold the text
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = tableText;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+
+                // Simple feedback for the user
+                const originalText = document.getElementById('copySummaryButton').textContent;
+                document.getElementById('copySummaryButton').textContent = 'Copied!';
+                setTimeout(() => {
+                    document.getElementById('copySummaryButton').textContent = originalText;
+                }, 2000);
+            });
+            
+            // Copy to clipboard functionality for the data row only
+            document.getElementById('copySummaryRowButton').addEventListener('click', () => {
+                const table = document.getElementById('summaryTable');
+                let rowText = '';
+                
+                // Get row data
+                const row = table.querySelector('tbody tr');
+                const rowData = Array.from(row.querySelectorAll('td')).map(td => td.textContent.trim());
+                rowText += rowData.join('\t');
+
+                // Create a temporary textarea to hold the text
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = rowText;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+
+                // Simple feedback for the user
+                const originalText = document.getElementById('copySummaryRowButton').textContent;
+                document.getElementById('copySummaryRowButton').textContent = 'Copied!';
+                setTimeout(() => {
+                    document.getElementById('copySummaryRowButton').textContent = originalText;
+                }, 2000);
+            });
+
+
+            // Recalculate on any input or dropdown change
+            inputs.forEach(input => input.addEventListener('input', updateCalculator));
+            dropdowns.forEach(dropdown => dropdown.addEventListener('change', updateCalculator));
+
+            // Initial calculation
+            updateCalculator();
+        });
+    </script>
+</body>
+</html>
